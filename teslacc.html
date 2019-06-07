@@ -1,249 +1,247 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Tesla Info Center</title>
-  <link href="info.css" media="screen" rel="stylesheet" type="text/css" />
-</head>
-<body>
-	<div id="container">
-		
-	</div>
-</body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script>
-	var GET = {};
-	var query = window.location.search.substring(1).split("&");
-	for (var i = 0, max = query.length; i < max; i++)
-	{
-		if (query[i] === "") // check for trailing & with no param
-			continue;
-
-		var param = query[i].split("=");
-		GET[decodeURIComponent(param[0])] = decodeURIComponent(param[1] || "");
-	}
-	function convertToHHMM(info) {
-				var hrs = parseInt(Number(info));
-				var min = Math.round((Number(info)-hrs) * 60);
-				if (hrs > 0){return hrs+'h '+min+ 'm remaining';}
-				else {return min+ 'm remaining';}
-			}
-	function getvitals() {
-		var vitalsfile = "";
-		if (GET.vin == "56510") {
-			vitalsfile = "../joevitals.json";
-		}
-		else {
-			vitalsfile = "../vitals.json";
-		}
-		
-		$.getJSON(vitalsfile, function(json) {
-		//json.chg_current_total = 1;
-		document.title = json.carName + " Info"
-		if (json.isCharging == '"Charging"') {
-			$('#container').load('charge.html', function(){
-				console.log("Charge happens!");
-				charge(json);
-			});
-		}
-		else {
-			$('#container').load('hud.html', function(){
-				console.log("Hud happens!");
-				hud(json);
-			});
-		}
-		});
-	}
-	getvitals()
-	window.setInterval(getvitals, 10000);
-	
-	function round(value, precision) {
-    var multiplier = Math.pow(10, precision || 0);
-    return Math.round(value * multiplier) / multiplier;
-}
-	function hud(myObj) {
-			$("#carName").html(myObj.carName);
-			$("#VIN").html(myObj.vin);
-			$("#soe").html(Math.round(myObj.SOE) + " %");
-			$("#range").html(Math.round(myObj.range) + " mi");
-			$("#odometer").html(Math.round(myObj.odo).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-			$("#trip_chg_miles").html(round(myObj.trip_chg_miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
-			$("#trip_chg_kwh").html(round(myObj.trip_chg_kwh, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>kWh</p>");
-			$("#trip_chg_whpm").html(Math.round(myObj.trip_chg_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
-
-			//First thing we need is our hours slices for Start and End times
-			StartTime = myObj.EV_tripCurrent_StartTime.slice((myObj.EV_tripCurrent_StartTime.indexOf(":")-3), (myObj.EV_tripCurrent_StartTime.indexOf(":")+3));
-			StartTimeHours = new Date(myObj.EV_tripCurrent_StartTime).getHours();
-			StartTimeMinutes = new Date(myObj.EV_tripCurrent_StartTime).getMinutes();
-			EndTime = myObj.EV_tripCurrent_EndTime.slice((myObj.EV_tripCurrent_EndTime.indexOf(":")-3), (myObj.EV_tripCurrent_EndTime.indexOf(":")+3));
-			CurrentTime = myObj.time.slice((myObj.time.indexOf(":")-3), (myObj.time.indexOf(":")+3));
-			console.log (myObj.EV_tripCurrent_StartTime);
-			console.log (StartTime + " /" + EndTime);
-			//Hour equation for UTC conversion
-			//If current hour conversion brings us back before midnight (<0)
-
-			var d = new Date();
-			var utc_converted = (d.getTimezoneOffset()/60);
-			console.log("UTC offset: " + (d.getTimezoneOffset()/60));
-			utc_converted = 5;
-
-			//console.log("UTC Conversion: " + utc_converted)
-			if ((StartTimeHours - utc_converted) < 0) {
-				hours = ((StartTimeHours - utc_converted)+24);
-				console.log ("IF 1: " + hours);
-				}
-			//If hour conversion brings us forward of midnight (>24)	
-			else if ((StartTimeHours - utc_converted) > 24) {
-				hours = ((StartTimeHours - utc_converted)-24);
-				console.log ("IF 2: " + hours);
-				}
-			else {
-				hours = (StartTimeHours - utc_converted);
-			}
-			ampm = " AM";
-			if (hours == 0) {
-				hours = 12;	
-			}
-			if (hours > 12) {
-				hours = hours-12;
-				ampm = " PM";
-			}
-				
-			$("#sinceBlock").html("Since "+ hours + ":" + (StartTimeMinutes < 10 ? "0" : "") + StartTimeMinutes + ampm); 
-
-			console.log ("Current time " + myObj.time);
-			var h = new Date(myObj.time);
-			console.log (h.getHours());
-
-			$("#EV_tripCurrent_Miles").html(round(myObj.EV_tripCurrent_Miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
-			
-			if (myObj.EV_tripCurrent_EndTime != "<invalid>") {
-				var d1 = new Date(myObj.EV_tripCurrent_EndTime);
-				var d2 = new Date(myObj.EV_tripCurrent_StartTime);
-				var minutes = Math.round(((d1-d2)/1000)/60);
-			}
-			else {
-				var d1 = new Date(myObj.time);
-				var d2 = new Date(myObj.EV_tripCurrent_StartTime);
-				var minutes = Math.round(((d1-d2)/1000)/60);
-
-			}
-			
-			$("#EV_tripCurrent_Min").html(minutes +"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>min</p>");
-			$("#EV_tripCurrent_whpm").html(Math.round(myObj.EV_tripCurrent_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
-			
-			if (myObj.dayMode == "false") {
-				document.body.style.backgroundColor = "black";
-			} else {
-				document.body.style.backgroundColor = "#262729";
-				}
-			var tpSensors = ['tl', 'tr', 'bl', 'br']
-			for (var i = 0; i < tpSensors.length; i++) {
-				if (myObj.tpms_pressure_fl == null) {
-					document.getElementById(tpSensors[i]).innerHTML = "--" + " psi";
-				}
-				else {
-					document.getElementById(tpSensors[i]).innerHTML = Math.round(myObj.tpms_pressure_fl*14.504) + " psi";
-					if (myObj.tpms_pressure_fl*14.504 <= 38) {document.getElementById(tpSensors[i]).style.color = "#c81e1e";}
-					else {document.getElementById(tpSensors[i]).style.color = "#d7d7d7"}
-				}
-			}
-			if (myObj.cfg_sunroof == "Gen1") {
-				var image = document.getElementById("roof");
-				image.src = "assets/roof_pano.png";
-			}
-			if (myObj.cfg_spoiler == "Passive") {
-				var image = document.getElementById("spoiler");
-				image.src = "assets/spoiler.png";
-			}
-			switch (myObj.cfg_exteriorcolor) {
-				case "Black":
-					break;
-				case "SteelGrey":
-					document.getElementById("carColor").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";
-					document.getElementById("roof").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";
-					break;
-			}
-			
-			if (myObj.SOE > 20) {
-				document.getElementById("energyStore").style.width = Math.round(myObj.SOE-1)+"px";
-				document.getElementById("energyStore").style.backgroundPosition = "0px 0px";
-				} else if (myObj.SOE <= 20 && myObj.SOE > 7) {
-					document.getElementById("energyStore").style.width = Math.round(myObj.SOE)+"px";
-					document.getElementById("energyStore").style.backgroundPosition = "-96px 0px";
-				} else if (myObj.SOE <= 7) {
-					document.getElementById("energyStore").style.width = Math.round(myObj.SOE)+"px";
-					document.getElementById("energyStore").style.backgroundPosition = "-191px 0px";
-				}
-			//music_data
-			document.getElementById("album_cover").style.backgroundImage = "url('" + myObj.album_cover.split('-', 1)[0] + "')";
-			$("#song_artist").html(myObj.song_artist);
-			$("#song_name").html(myObj.song_name);
-			$("#album_name").html(myObj.album_name);
-			//Function to change song length in milliseconds to mmss
-			function minTommss(minutes){
-				 var sign = minutes < 0 ? "-" : "";
-				 var min = Math.floor(Math.abs(minutes));
-				 var sec = Math.floor((Math.abs(minutes) * 60) % 60);
-				 return sign + min + ":" + (sec < 10 ? "0" : "") + sec;
-			}
-			
-			var sec = myObj.song_time_elapsed/60000;
-			//console.log("Song time elapsed: " + myObj.song_time_elapsed/60000)
-			sec = Math.floor((Math.abs(sec) * 60) % 60);
-			//console.log("Minutes: " + Math.floor(Math.abs(myObj.song_time_elapsed/60000)));
-
-			function pad(val) {
-				return val > 9 ? val : "0" + val;
-			}
-			$("#minutes").html(Math.floor(Math.abs(myObj.song_time_elapsed/60000)));
-			$("#seconds").html(pad(sec));
-			if (myObj.song_time_elapsed > 0) {
-				
-				var timer = setInterval(function () {
-					$("#minutes").html(Math.floor(Math.abs(myObj.song_time_elapsed/60000)));
-					$("#seconds").html(pad(++sec));
-				}, 1000);
-
-				setTimeout(function () {
-					clearInterval(timer);
-				}, 10000);
-			}
-			//Insert song duration
-			$("#song_duration").html(minTommss(myObj.song_duration/60000));
-		  };
-	function charge(myObj){
-	console.log("I'm a chargin'");
-	$("#chargetitle").html(myObj.carName);
-				//document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";
-	$("#soe2").html(Math.round(myObj.SOE));
-	$("#range2").html(Math.round(myObj.range));
-	$("#energy_added").html("+ " + Math.round(myObj.energy_added) + " kWh");
-	$("#chargeTimeRemaining").html(convertToHHMM(myObj.chargeTimeRemaining));
-	$("#chg_current_total").html(((myObj.chg_current_total*240)/1000).toFixed(2) + " kW");
-	$("#chg_volts").html(myObj.chg_voltage_total + " V");
-	$("#chg_amps").html(myObj.chg_current_total +" A");
-	}	
-	</script>
-</html>
-
-<!-- 
-Important notes:
-"cfg_roof_color":"None"
-"cfg_sunroof":"Gen1" for sunroof
-"cfg_exteriorcolor":"Black" for car color
-"tpms_pressure_fl":null,"tpms_pressure_fr":null,"tpms_pressure_rl":null,"tpms_pressure_rr":null - Formula	
-for an approximate result, multiply the pressure value by 14.504
-"gps_hdg":271.7,
-"curr_lat":30.635546,"curr_lat2":30.635546,"curr_lat_raw":30.635546,"curr_lon":-87.134476,"curr_lon2":-87.134476,"curr_lon_raw":-87.134476,
-"nav_lat":30.635534,"nav_lon":-87.134117
-"cfg_spoiler":"Passive"
-	"trip_chg_kwh": 8.866,
-	"trip_chg_miles": 25.81,
-	"trip_chg_whpm": 343.5,
-	EV_tripCharge_Start,77350.542
-EV_tripCharge_kWh,18.310
-EV_tripCurrent_Miles,3.012
-EV_tripCurrent_whpm,336.310
-VAPI_chargeTimeToFull
-GUI_chargeSessionIdealEnergyAdded
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tesla Info Center</title>
+  <link href="info.css" media="screen" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<div id="container">
+		
+	</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+	var GET = {};
+	var query = window.location.search.substring(1).split("&");
+	for (var i = 0, max = query.length; i < max; i++)
+	{
+		if (query[i] === "") // check for trailing & with no param
+			continue;
+
+		var param = query[i].split("=");
+		GET[decodeURIComponent(param[0])] = decodeURIComponent(param[1] || "");
+	}
+	function convertToHHMM(info) {
+				var hrs = parseInt(Number(info));
+				var min = Math.round((Number(info)-hrs) * 60);
+				if (hrs > 0){return hrs+'h '+min+ 'm remaining';}
+				else {return min+ 'm remaining';}
+			}
+	function getvitals() {
+		var vitalsfile = "";
+		if (GET.vin == "56510") {
+			vitalsfile = "../joevitals.json";
+		}
+		else {
+			vitalsfile = "../vitals.json";
+		}
+		
+		$.getJSON(vitalsfile, function(json) {
+		//json.chg_current_total = 1;
+		document.title = json.carName + " Info"
+		if (json.chargeState == "Charging") {
+			$('#container').load('charge.html', function(){
+				console.log("Charge happens!");
+				charge(json);
+			});
+		}
+		else {
+			$('#container').load('hud.html', function(){
+				console.log("Hud happens!");
+				hud(json);
+			});
+		}
+		if (json.dayMode == "false") {
+				document.body.style.backgroundColor = "black";
+			} 
+			else {
+				document.body.style.backgroundColor = "#262729";
+			}
+		});
+	}
+	getvitals()
+	window.setInterval(getvitals, 10000);
+	
+	function round(value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
+}
+	function hud(myObj) {
+			$("#carName").html(myObj.carName);
+			$("#VIN").html(myObj.vin);
+			$("#soe").html(Math.round(myObj.SOE) + " %");
+			$("#range").html(Math.round(myObj.range) + " mi");
+			$("#odometer").html(Math.round(myObj.odo).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+			$("#trip_chg_miles").html(round(myObj.trip_chg_miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
+			$("#trip_chg_kwh").html(round(myObj.trip_chg_kwh, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>kWh</p>");
+			$("#trip_chg_whpm").html(Math.round(myObj.trip_chg_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
+
+			//First thing we need is our hours slices for Start and End times
+			StartTime = myObj.EV_tripCurrent_StartTime.slice((myObj.EV_tripCurrent_StartTime.indexOf(":")-3), (myObj.EV_tripCurrent_StartTime.indexOf(":")+3));
+			StartTimeHours = new Date(myObj.EV_tripCurrent_StartTime).getHours();
+			StartTimeMinutes = new Date(myObj.EV_tripCurrent_StartTime).getMinutes();
+			EndTime = myObj.EV_tripCurrent_EndTime.slice((myObj.EV_tripCurrent_EndTime.indexOf(":")-3), (myObj.EV_tripCurrent_EndTime.indexOf(":")+3));
+			CurrentTime = myObj.time.slice((myObj.time.indexOf(":")-3), (myObj.time.indexOf(":")+3));
+			//console.log (myObj.EV_tripCurrent_StartTime);
+			//console.log (StartTime + " /" + EndTime);
+			//Hour equation for UTC conversion
+			//If current hour conversion brings us back before midnight (<0)
+
+			utc_converted = myObj.utcoffset/-3600;
+
+			//console.log("UTC Conversion: " + utc_converted)
+			if ((StartTimeHours - utc_converted) < 0) {
+				hours = ((StartTimeHours - utc_converted)+24);
+				console.log ("IF 1: " + hours);
+				}
+			//If hour conversion brings us forward of midnight (>24)	
+			else if ((StartTimeHours - utc_converted) > 24) {
+				hours = ((StartTimeHours - utc_converted)-24);
+				console.log ("IF 2: " + hours);
+				}
+			else {
+				hours = (StartTimeHours - utc_converted);
+			}
+			ampm = " AM";
+			if (hours == 0) {
+				hours = 12;	
+			}
+			if (hours > 12) {
+				hours = hours-12;
+				ampm = " PM";
+			}
+				
+			$("#sinceBlock").html("Since "+ hours + ":" + (StartTimeMinutes < 10 ? "0" : "") + StartTimeMinutes + ampm); 
+
+			console.log ("Current time " + myObj.time);
+			var h = new Date(myObj.time);
+			console.log (h.getHours());
+
+			$("#EV_tripCurrent_Miles").html(round(myObj.EV_tripCurrent_Miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
+			
+			if (myObj.EV_tripCurrent_EndTime != "<invalid>") {
+				var d1 = new Date(myObj.EV_tripCurrent_EndTime);
+				var d2 = new Date(myObj.EV_tripCurrent_StartTime);
+				var minutes = Math.round(((d1-d2)/1000)/60);
+			}
+			else {
+				var d1 = new Date(myObj.time);
+				var d2 = new Date(myObj.EV_tripCurrent_StartTime);
+				var minutes = Math.round(((d1-d2)/1000)/60)+300;
+
+			}
+			
+			$("#EV_tripCurrent_Min").html(minutes +"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>min</p>");
+			$("#EV_tripCurrent_whpm").html(Math.round(myObj.EV_tripCurrent_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
+			
+			var tpSensors = ['tl', 'tr', 'bl', 'br']
+			for (var i = 0; i < tpSensors.length; i++) {
+				if (myObj.tpms_pressure_fl == null) {
+					document.getElementById(tpSensors[i]).innerHTML = "--" + " psi";
+				}
+				else {
+					document.getElementById(tpSensors[i]).innerHTML = Math.round(myObj.tpms_pressure_fl*14.504) + " psi";
+					if (myObj.tpms_pressure_fl*14.504 <= 38) {document.getElementById(tpSensors[i]).style.color = "#c81e1e";}
+					else {document.getElementById(tpSensors[i]).style.color = "#d7d7d7"}
+				}
+			}
+			if (myObj.cfg_sunroof == "Gen1") {
+				var image = document.getElementById("roof");
+				image.src = "assets/roof_pano.png";
+			}
+			if (myObj.cfg_spoiler == "Passive") {
+				var image = document.getElementById("spoiler");
+				image.src = "assets/spoiler.png";
+			}
+			switch (myObj.cfg_exteriorcolor) {
+				case "Black":
+					break;
+				case "SteelGrey":
+					document.getElementById("carColor").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";
+					document.getElementById("roof").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";
+					break;
+			}
+			//myObj.SOE = 7;
+			if (myObj.SOE > 20) {
+				document.getElementById("energyStore").style.width = Math.round(myObj.SOE-1)+"px";
+				document.getElementById("energyStore").style.backgroundPosition = "4px 0px";
+				} else if (myObj.SOE <= 20 && myObj.SOE > 7) {
+					document.getElementById("energyStore").style.width = Math.round(myObj.SOE)+"px";
+					document.getElementById("energyStore").style.backgroundPosition = "-92px 0px";
+				} else if (myObj.SOE <= 7) {
+					document.getElementById("energyStore").style.width = Math.round(myObj.SOE+6)+"px";
+					document.getElementById("energyStore").style.backgroundPosition = "-188px 0px";
+				}
+			//music_data
+			document.getElementById("album_cover").style.backgroundImage = "url('" + myObj.album_cover.split('-', 1)[0] + "')";
+			$("#song_artist").html(myObj.song_artist);
+			$("#song_name").html(myObj.song_name);
+			$("#album_name").html(myObj.album_name);
+			//Function to change song length in milliseconds to mmss
+			function minTommss(minutes){
+				 var sign = minutes < 0 ? "-" : "";
+				 var min = Math.floor(Math.abs(minutes));
+				 var sec = Math.floor((Math.abs(minutes) * 60) % 60);
+				 return sign + min + ":" + (sec < 10 ? "0" : "") + sec;
+			}
+			
+			var sec = myObj.song_time_elapsed/60000;
+			//console.log("Song time elapsed: " + myObj.song_time_elapsed/60000)
+			sec = Math.floor((Math.abs(sec) * 60) % 60);
+			//console.log("Minutes: " + Math.floor(Math.abs(myObj.song_time_elapsed/60000)));
+
+			function pad(val) {
+				return val > 9 ? val : "0" + val;
+			}
+			$("#minutes").html(Math.floor(Math.abs(myObj.song_time_elapsed/60000)));
+			$("#seconds").html(pad(sec));
+			if (myObj.song_time_elapsed > 0) {
+				
+				var timer = setInterval(function () {
+					$("#minutes").html(Math.floor(Math.abs(myObj.song_time_elapsed/60000)));
+					$("#seconds").html(pad(++sec));
+				}, 1000);
+
+				setTimeout(function () {
+					clearInterval(timer);
+				}, 10000);
+			}
+			//Insert song duration
+			$("#song_duration").html(minTommss(myObj.song_duration/60000));
+		  };
+	function charge(myObj){
+	console.log("I'm a chargin'");
+	$("#chargetitle").html(myObj.carName);
+				//document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";
+	$("#soe2").html(Math.round(myObj.SOE));
+	$("#range2").html(Math.round(myObj.range));
+	$("#energy_added").html("+ " + (myObj.energy_added) + " kWh");
+	$("#chargeTimeRemaining").html(convertToHHMM(myObj.chargeTimeRemaining));
+	$("#chg_current_total").html(((myObj.chg_current_total*240)/1000).toFixed(2) + " kW");
+	$("#chg_volts").html(myObj.chg_voltage_total + " V");
+	$("#chg_amps").html(myObj.chg_current_total +" A");
+	}	
+	</script>
+</html>
+
+<!-- 
+Important notes:
+"cfg_roof_color":"None"
+"cfg_sunroof":"Gen1" for sunroof
+"cfg_exteriorcolor":"Black" for car color
+"tpms_pressure_fl":null,"tpms_pressure_fr":null,"tpms_pressure_rl":null,"tpms_pressure_rr":null - Formula	
+for an approximate result, multiply the pressure value by 14.504
+"gps_hdg":271.7,
+"curr_lat":30.635546,"curr_lat2":30.635546,"curr_lat_raw":30.635546,"curr_lon":-87.134476,"curr_lon2":-87.134476,"curr_lon_raw":-87.134476,
+"nav_lat":30.635534,"nav_lon":-87.134117
+"cfg_spoiler":"Passive"
+	"trip_chg_kwh": 8.866,
+	"trip_chg_miles": 25.81,
+	"trip_chg_whpm": 343.5,
+	EV_tripCharge_Start,77350.542
+EV_tripCharge_kWh,18.310
+EV_tripCurrent_Miles,3.012
+EV_tripCurrent_whpm,336.310
+VAPI_chargeTimeToFull
+GUI_chargeSessionIdealEnergyAdded
 -->
