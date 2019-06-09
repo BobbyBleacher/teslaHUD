@@ -169,7 +169,7 @@ div.car {
 	height: 33px;
 	width: 102px;
 	position: absolute;
-	top: 4px;
+	top: 3px;
 	left: 11px;
 	z-index: 1;
 	#border: 3px solid #FF0000;
@@ -179,7 +179,7 @@ div.car {
 	height: 39px;
 	z-index:2;
 	position:absolute;
-	left: 8px;
+	left: 8px;		#top: 1px;
 }
 #soe, #range, #power_remaining, #battery_graphic{
 	font-weight:bold;
