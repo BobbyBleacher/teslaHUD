@@ -144,51 +144,51 @@ div.car {
 #carBodyShadow {
 	width: 450px;
 	height: 519px;
-	/*border: 3px solid #FFFFFF;*/
+	#border: 3px solid #FFFFFF;
 	background: url(assets/shadow_cluster.png);
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 	position: relative;
 	margin: 0 auto;
 }
-#batteryHolder {
-	/*border: 3px solid #FF0000;*/
+#battery_stats {
+	#border: 3px solid red;
 	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;	
+	margin-top: 30px;
+	#line-height: 0px;
 }
-
 #batteryWrapper {
-	background: url(assets/battery_outline.png);
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	height: 40px;
-	/*border: 3px solid #FF0000;*/
-}
-#chargeSymbol {
-	background: url(assets/img_trans.gif);
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	height: 37px;
-	width: 95px;
-}
-#energyStore {
-	width: 99px;
-	height: 40px;
-	background: url(assets/battery_color_sprite.png) 0px 0px;
-	background-repeat: no-repeat;
-	position: absolute;
-	left: 35px;
-	top: 22px
+	height: 39px;
+	#border: 3px solid blue;
+	width: 108px;
+	display: inline-block;
+	vertical-align:middle;
+	z-index: 0;
 }
 #batteryBG {
-	background: url(assets/battery_color_bg.png);
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	height: 40px;
+	height: 33px;
+	width: 102px;
+	position: absolute;
+	top: 4px;
+	left: 11px;
+	z-index: 1;
+	#border: 3px solid #FF0000;
 }
-
+#energyStore {
+	background: url(assets/battery_color_sprite.png) 0 0 no-repeat;
+	height: 39px;
+	z-index:2;
+	position:absolute;
+	left: 8px;
+}
+#soe, #range, #power_remaining, #battery_graphic{
+	font-weight:bold;
+	font-size:24px;
+	display:inline-block;
+	width: 24%;
+	height: 40px;
+	text-align:center;
+}
 #music_container {
 	height: 180px;
 	width: 500px;
@@ -196,7 +196,6 @@ div.car {
 	display: inline-block;
 	/*border: 3px solid #FFFFFF;*/
 }
-
 #album_cover {
 	background: url(assets/battery_color_bg.png);
 	background-repeat: no-repeat;
@@ -211,15 +210,9 @@ div.car {
 	float:left;
 }
 #music_data {
-	
-	/*border: 3px solid #FF0000;*/
+	#border: 3px solid red;
 	margin: 35px auto 0;
 }
-#timeline {
-	
-	
-}
-
 div.car {
 	display: flex;
 	align-items: center;
@@ -240,20 +233,14 @@ img.carRoof {
 	top: 483px;
 	left: 172px;
 }
-#batteryWrapper, #soeWrapper, #rangeWrapper {
-	width: 33%;
-	/*border: 3px solid blue;*/
-	float: left;
-}
-#range, #soe, #soeWrapper, #batteryWrapper, #rangeWrapper {
+
+#range, #soe, #batteryWrapper{
 	text-align: center;
 }
-
 #VIN {
 	margin-left:auto;
 	margin-bottom:100px;
 }
-
 #ghost{
 	margin: 0 auto;
 	width: 800px;
@@ -349,8 +336,13 @@ img.carRoof {
 	font-weight: bold;
 	display:inline-block;
 }
-#soe2container {
-	width: 400px;
+#power_remaining2{
+	font-size: 46pt;
+	font-weight: bold;
+	display:inline-block;
+}
+#soe2container{
+	width: 700px;
 	height: 70px;
 	margin: 0 auto;
 	text-align: center;
@@ -362,6 +354,13 @@ img.carRoof {
 	color:#a9a9a9;
 	display:inline-block;
 	position:relative;
+	margin: 0;
+	padding: 0;
+}
+.mini_appends {
+	font-size:14pt;
+	color:#a9a9a9;
+	display:inline-block;
 	margin: 0;
 	padding: 0;
 }

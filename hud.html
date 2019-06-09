@@ -12,16 +12,15 @@
 					<div class="BR"><p id="br"></p></div>
 				</div>
 			</div>
-			<div id="batteryHolder">
-				<div id="batteryWrapper">
-					<div id="batteryBG">
-						<div id="energyStore">
-							<div id="chargeSymbol"></div>
-						</div>
-					</div>
-				</div>
-				<div id="soeWrapper"><p style="font-weight:bold;font-size:24px;display: inline-block;" id="soe">SOE %</p></div>
-				<div id="rangeWrapper"><p style="font-weight:bold;font-size:24px;display: inline-block;" id="range">0 mi</p></div>
+			<div id="battery_stats">
+				<span id="battery_graphic">
+					<img id="batteryWrapper" src="assets/battery_outline.png" />
+					<img id="batteryBG" src="assets/battery_color_bg.png" />
+					<img id="energyStore" src="assets/img_trans.gif" />
+				</span>
+				<span id="soe">SOE<span class="mini_appends">&nbsp;%</span></span>
+				<span id="range">0<span class="mini_appends">&nbsp;mi</span></span>
+				<span id="power_remaining"><span class="mini_appends">&nbsp;kWh</span></span>
 			</div>
 			<!--<div id="charging_data">
 			<p style="font-size:16px;display:inline-block;margin: 0 35px" id="energy_added">&nbsp</p>

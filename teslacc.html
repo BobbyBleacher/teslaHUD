@@ -69,12 +69,13 @@
 	function hud(myObj) {
 			$("#carName").html(myObj.carName);
 			$("#VIN").html(myObj.vin);
-			$("#soe").html(Math.round(myObj.SOE) + " %");
-			$("#range").html(Math.round(myObj.range) + " mi");
+			$("#soe").html(Math.round(myObj.SOE) + '<span class="mini_appends">&nbsp;%</span>');
+			$("#range").html(Math.round(myObj.range) + '<span class="mini_appends">&nbsp;mi</span>');
 			$("#odometer").html(Math.round(myObj.odo).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 			$("#trip_chg_miles").html(round(myObj.trip_chg_miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
 			$("#trip_chg_kwh").html(round(myObj.trip_chg_kwh, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>kWh</p>");
 			$("#trip_chg_whpm").html(Math.round(myObj.trip_chg_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
+			$("#power_remaining").html((myObj.bms_nominal_fullpack*(myObj.SOE/100)).toFixed(2) + '<span class="mini_appends">&nbsp;kWh</span>');
 
 			//First thing we need is our hours slices for Start and End times
 			StartTime = myObj.EV_tripCurrent_StartTime.slice((myObj.EV_tripCurrent_StartTime.indexOf(":")-3), (myObj.EV_tripCurrent_StartTime.indexOf(":")+3));
@@ -220,6 +221,7 @@
 	$("#chg_current_total").html(((myObj.chg_current_total*240)/1000).toFixed(2) + " kW");
 	$("#chg_volts").html(myObj.chg_voltage_total + " V");
 	$("#chg_amps").html(myObj.chg_current_total +" A");
+	$("#power_remaining2").html((myObj.bms_nominal_fullpack*(myObj.SOE/100)).toFixed(2));
 	}	
 	</script>
 </html>
