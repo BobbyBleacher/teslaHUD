@@ -297,7 +297,7 @@ img.carRoof {
 }
 #batterybgmiddle {
 	background: url(assets/battery_background_slice.png) repeat-x 0 0;
-	width: 265px;
+	width: 268px;
 	height: 100px;
 	position:absolute;
 	top: 333px;
@@ -309,7 +309,7 @@ img.carRoof {
 	height:100px;
 	position:absolute;
 	top: 333px;
-	left:645px;
+	left:648px;
 }
 #namecontainer{
 	text-align: center;
