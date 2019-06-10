@@ -37,7 +37,7 @@
 		}
 		
 		$.getJSON(vitalsfile, function(json) {
-		//json.chg_current_total = 1;
+		//json.chargeState = "Charging"
 		document.title = json.carName + " Info"
 		if (json.chargeState == "Charging") {
 			$('#container').load('charge.html', function(){
@@ -222,6 +222,7 @@
 	$("#chg_volts").html(myObj.chg_voltage_total + " V");
 	$("#chg_amps").html(myObj.chg_current_total +" A");
 	$("#power_remaining2").html((myObj.bms_nominal_fullpack*(myObj.SOE/100)).toFixed(2));
+	//document.getElementById("svg_bar").style.width = (298 * (myObj.SOE/100));
 	}	
 	</script>
 </html>
