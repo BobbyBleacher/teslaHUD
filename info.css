@@ -169,8 +169,8 @@ div.car {
 	height: 33px;
 	width: 102px;
 	position: absolute;
-	top: 3px;
-	left: 6px;
+	top: 4px;
+	left: 8px;
 	z-index: 1;
 	#border: 3px solid #FF0000;
 }
@@ -188,6 +188,9 @@ div.car {
 	width: 22%;
 	height: 40px;
 	text-align:center;
+}
+#power_remaining{
+	width: 150px;
 }
 #music_container {
 	height: 180px;
