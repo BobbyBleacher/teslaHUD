@@ -169,8 +169,8 @@ div.car {
 	height: 33px;
 	width: 102px;
 	position: absolute;
-	top: 4px;
-	left: 8px;
+	top: 3px;
+	left: 6px;
 	z-index: 1;
 	#border: 3px solid #FF0000;
 }
@@ -314,13 +314,61 @@ img.carRoof {
 	top: 333px;
 	left:648px;
 }
-#battery_mask {
+#battery_mask_left, #battery_mask_middle, #battery_mask_right{
+	-webkit-filter: opacity(.4);
+	filter: opacity(.4);
+}
+#battery_mask_left {
 	background: url(assets/battery_mask.png) no-repeat 0 0;
 	width:30px;
 	height:100px;
 	position:absolute;
 	top: 333px;
 	left: 350px;
+}
+#battery_mask_middle{
+	background: url(assets/battery_mask_slice.png) repeat-x 0 0;
+	width: 268px;
+	height: 100px;
+	position:absolute;
+	top: 333px;
+	left:380px;
+}
+#battery_mask_right{
+	background: url(assets/battery_mask.png) no-repeat -30px 0;
+	width:32px;
+	height:100px;
+	position:absolute;
+	top: 333px;
+	left:648px;
+}
+#mask_container{
+	position: absolute;
+	top: 335px;
+	left: 363px;
+	width: 330px;
+	height: 96px;
+	border-radius: 6px;
+	overflow: hidden;
+	-webkit-transform: skew(-14deg, 0deg);
+    -ms-transform: skew(-14deg, 0deg);
+    -o-transform: skew(-14deg, 0deg);
+    transform: skew(-14deg, 0deg);
+}
+#battery_mask_gradient{
+	#background: linear-gradient(to right, crimson, dodgerblue);
+	background: linear-gradient(to right, #324a2a7d, #20bb009e);
+	border-radius: 4px;
+	display: inline-block;
+	#overflow: hidden;
+	width: 341px;
+	height: 96px;
+	position: absolute;
+	left: -18px;
+	-webkit-transform: skew(24deg, 0deg);
+        -ms-transform: skew(24deg, 0deg);
+         -o-transform: skew(24deg, 0deg);
+            transform: skew(24deg, 0deg);
 }
 #namecontainer{
 	text-align: center;
@@ -377,16 +425,16 @@ img.carRoof {
 }
 rect {
     cursor: pointer;
-    shape-rendering: crispEdges;
+    #shape-rendering: crispEdges;
+	border-radius: 30px;
     fill: url(#MyGradient);
-	
 }
 #svg_bar {
 	width:298px;
-	height:98px;
+	height:96px;
 	-webkit-filter: opacity(.95);
 	filter: opacity(.95);
 	position: absolute;
-	top: 333px;
+	top: 335px;
 	left: 350px;
 }

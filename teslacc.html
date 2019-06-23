@@ -3,6 +3,7 @@
 <head>
   <title>Tesla Info Center</title>
   <link href="info.css" media="screen" rel="stylesheet" type="text/css" />
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 </head>
 <body>
 	<div id="container">
@@ -45,13 +46,23 @@
 			async: false,
 			dataType: 'json'
 		}).responseJSON;
+
+		if (typeof(json_lv.GUI_vehicleName) == 'undefined') {
+			$('#container').load('hud.html', function(){
+				console.log("Failed to get data!");
+				$("#carName").html("No data");
+				$("#VIN").html("Try again later");
+			});
+		}
 		
-		//json.chargeState = "Charging"
+		//DELETE
+		//json_lv.GTW_chargeState = "Charging"
 		document.title = json_lv.GUI_vehicleName + " Info"
+		console.log(json_lv.GUI_vehicleName);
 		if (json_lv.GTW_chargeState == "Charging") {
 			$('#container').load('charge.html', function(){
 				console.log("Charge happens!");
-				charge(json_lv, json_raw);
+				charge(json_lv, json_raw);	
 			});
 		}
 		else {
@@ -90,7 +101,7 @@
 			StartTimeHours = new Date(lv.EV_tripCurrent_StartTime).getHours();
 			StartTimeMinutes = new Date(lv.EV_tripCurrent_StartTime).getMinutes();
 			EndTime = lv.EV_tripCurrent_EndTime.slice((lv.EV_tripCurrent_EndTime.indexOf(":")-3), (lv.EV_tripCurrent_EndTime.indexOf(":")+3));
-			CurrentTime = raw.time.slice((raw.time.indexOf(":")-3), (raw.time.indexOf(":")+3));
+
 			//console.log (lv.EV_tripCurrent_StartTime);
 			//console.log (StartTime + " /" + EndTime);
 			//Hour equation for UTC conversion
@@ -127,11 +138,11 @@
 
 			console.log ("Current time " + raw.time);
 			var h = new Date(raw.time);
-			console.log (h.getHours());
 
 			$("#EV_tripCurrent_Miles").html(round(lv.EV_tripCurrent_Miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
-			
-			if (lv.EV_tripCurrent_EndTime != "<invalid>") {
+			//lv.EV_tripCurrent_EndTime = "<invalid>"
+			console.log(lv.EV_tripCurrent_EndTime);
+			if (lv.EV_tripCurrent_EndTime != "") {
 				var d1 = new Date(lv.EV_tripCurrent_EndTime);
 				var d2 = new Date(lv.EV_tripCurrent_StartTime);
 				var minutes = Math.round(((d1-d2)/1000)/60);
@@ -140,7 +151,7 @@
 				var d1 = new Date(raw.time);
 				var d2 = new Date(lv.EV_tripCurrent_StartTime);
 				var minutes = Math.round(((d1-d2)/1000)/60)+300;
-
+				
 			}
 			
 			$("#EV_tripCurrent_Min").html(minutes +"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>min</p>");
@@ -222,19 +233,24 @@
 			$("#song_duration").html(minTommss(lv.GUI_nowPlayingDuration/60000));
 		  };
 	function charge(lv, raw){
-	console.log("I'm a chargin'");
-	$("#chargetitle").html(lv.GUI_vehicleName);
-				//document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";
-	$("#soe2").html(Math.round(raw.SOE));
-	$("#range2").html(Math.round(raw.range));
-	$("#energy_added").html("+ " + (lv.GUI_chargeSessionIdealEnergyAdded) + " kWh");
-	$("#chargeTimeRemaining").html(convertToHHMM(lv.VAPI_chargeTimeToFull));
-	$("#chg_current_total").html(((raw.chg_current_total*240)/1000).toFixed(2) + " kW");
-	$("#chg_volts").html(raw.chg_voltage_total + " V");
-	$("#chg_amps").html(raw.chg_current_total +" A");
-	$("#power_remaining2").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2));
-	//document.getElementById("svg_bar").style.width = (298 * (raw.SOE/100));
-	}	
+		console.log("I'm a chargin'");
+		$("#chargetitle").html(lv.GUI_vehicleName);
+					//document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";
+		$("#soe2").html(Math.round(raw.SOE));
+		$("#range2").html(Math.round(raw.range));
+		$("#energy_added").html("+ " + (lv.GUI_chargeSessionIdealEnergyAdded) + " kWh");
+		$("#chargeTimeRemaining").html(convertToHHMM(lv.VAPI_chargeTimeToFull));
+		$("#chg_current_total").html(((raw.chg_current_total*240)/1000).toFixed(2) + " kW");
+		$("#chg_volts").html(raw.chg_voltage_total + " V");
+		$("#chg_amps").html(raw.chg_current_total +" A");
+		$("#power_remaining2").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2));
+		document.getElementById("battery_mask_gradient").style.width = Math.round((raw.SOE/100)*341)+"px";
+		//lv.GUI_inSuperchargerGeofence = "true"
+		if (lv.GUI_inSuperchargerGeofence == "true") {
+			document.getElementById("battery_mask_gradient").style.background = 'linear-gradient(to right, #000f487d, #002dff9e)';
+			console.log("True");
+		}
+	}
 	</script>
 </html>
 
