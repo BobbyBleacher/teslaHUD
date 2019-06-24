@@ -365,10 +365,10 @@ img.carRoof {
 	height: 96px;
 	position: absolute;
 	left: -18px;
-	-webkit-transform: skew(24deg, 0deg);
-        -ms-transform: skew(24deg, 0deg);
-         -o-transform: skew(24deg, 0deg);
-            transform: skew(24deg, 0deg);
+	-webkit-transform: skew(22deg, 0deg);
+        -ms-transform: skew(22deg, 0deg);
+         -o-transform: skew(22deg, 0deg);
+            transform: skew(22deg, 0deg);
 }
 #namecontainer{
 	text-align: center;
