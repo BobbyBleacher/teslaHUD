@@ -1,3 +1,7 @@
+1 Jul 2019:\
+-Found out JSon wasn't parsing properly when NAV_googlepolyline was in use for nav. Fixed it.\
+-Updates for supercharging real time data\
+\
 23 June 2019:\
 -Some basic error handling incase the cors-anywhere server goes down\
 -Battery graphic on charging page works now, but may not be bug free. Turns blue when Supercharging.\
