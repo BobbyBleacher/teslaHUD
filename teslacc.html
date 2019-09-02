@@ -7,7 +7,7 @@
 </head>
 <body>
 	<div id="container">
-		
+		<span>Loading...</span>
 	</div>
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -49,6 +49,12 @@
 			async: false,
 			dataType: 'json'
 		}).responseJSON;
+		
+		var price = $.ajax({
+			url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,LTC,BCH&tsyms=USD",
+			async: false,
+			dataType: 'json'
+		}).responseJSON;
 
 		if (typeof(json_lv.GUI_vehicleName) == 'undefined') {
 			$('#container').load('hud.html', function(){
@@ -71,7 +77,7 @@
 		else {
 			$('#container').load('hud.html', function(){
 				console.log("Hud happens!");
-				hud(json_lv, json_raw);
+				hud(json_lv, json_raw, price);
 			});
 		}
 		if (json_lv.GUI_dayMode == "false") {
@@ -88,7 +94,7 @@
     var multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
 }
-	function hud(lv, raw) {
+	function hud(lv, raw, price) {
 			$("#carName").html(lv.GUI_vehicleName);
 			$("#VIN").html(raw.vin);
 			$("#soe").html(Math.round(raw.SOE) + '<span class="mini_appends">&nbsp;%</span>');
@@ -98,6 +104,10 @@
 			$("#trip_chg_kwh").html(round(raw.trip_chg_kwh, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>kWh</p>");
 			$("#trip_chg_whpm").html(Math.round(raw.trip_chg_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
 			$("#power_remaining").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2) + '<span class="mini_appends">&nbsp;kWh</span>');
+			
+			if (lv.GUI_vehicleName == 'Tenebrae'){
+				$("#crypto_info").html("<span class='crypto_name'>BTC</span><span class='crypto_price'>" + price.BTC['USD'] + "</span><span class='crypto_name'>BCH</span><span class='crypto_price'>" + price.BCH['USD'] + "</span><span class='crypto_name'>ETH</span><span class='crypto_price'>" + price.ETH['USD'] + "</span><span class='crypto_name'>LTC</span><span class='crypto_price'>" + price.LTC['USD'] + "</span>");
+			}
 
 			//First thing we need is our hours slices for Start and End times
 			StartTime = lv.EV_tripCurrent_StartTime.slice((lv.EV_tripCurrent_StartTime.indexOf(":")-3), (lv.EV_tripCurrent_StartTime.indexOf(":")+3));
@@ -161,13 +171,14 @@
 			$("#EV_tripCurrent_whpm").html(Math.round(lv.EV_tripCurrent_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
 			
 			var tpSensors = ['tl', 'tr', 'bl', 'br']
+			var rawSensors = [raw.tpms_pressure_fl, raw.tpms_pressure_fr, raw.tpms_pressure_rl, raw.tpms_pressure_rr]
 			for (var i = 0; i < tpSensors.length; i++) {
 				if (raw.tpms_pressure_fl == null) {
 					document.getElementById(tpSensors[i]).innerHTML = "--" + " psi";
 				}
 				else {
-					document.getElementById(tpSensors[i]).innerHTML = Math.round(raw.tpms_pressure_fl*14.504) + " psi";
-					if (raw.tpms_pressure_fl*14.504 <= 38) {document.getElementById(tpSensors[i]).style.color = "#c81e1e";}
+					document.getElementById(tpSensors[i]).innerHTML = Math.round(rawSensors[i]*14.504) + " psi";
+					if (rawSensors[i]*14.504 <= 38) {document.getElementById(tpSensors[i]).style.color = "#c81e1e";}
 					else {document.getElementById(tpSensors[i]).style.color = "#d7d7d7"}
 				}
 			}
@@ -236,6 +247,7 @@
 			$("#song_duration").html(minTommss(lv.GUI_nowPlayingDuration/60000));
 		  };
 	function charge(lv, raw){
+	//raw.SOE = 10;
 		console.log("Shoop! I'm a-chargin'");
 		$("#chargetitle").html(lv.GUI_vehicleName);
 					//document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";
@@ -247,8 +259,8 @@
 		$("#chg_volts").html(raw.chg_voltage_total + " V");
 		$("#chg_amps").html(raw.chg_current_total +" A");
 		$("#power_remaining2").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2));
-		document.getElementById("battery_mask_gradient").style.width = Math.round((raw.SOE/100)*341)+"px";
-		skew = (10+parseFloat((Math.round((raw.SOE/100)*10)).toFixed(2)));
+		document.getElementById("battery_mask_gradient").style.width = Math.round((raw.SOE/100)*325)+"px";
+		skew = (1+parseFloat((Math.round((raw.SOE/100)*22)).toFixed(2)));
 		console.log("skew is " + skew)
 		document.getElementById("battery_mask_gradient").style.webkitTransform = "skew(" + skew + "deg)";
 		document.getElementById("battery_mask_gradient").style.MozTransform = "skew(" + skew + "deg)";
@@ -266,3 +278,25 @@
 	}
 	</script>
 </html>
+
+<!-- 
+Important notes:
+"cfg_roof_color":"None"
+"cfg_sunroof":"Gen1" for sunroof
+"cfg_exteriorcolor":"Black" for car color
+"tpms_pressure_fl":null,"tpms_pressure_fr":null,"tpms_pressure_rl":null,"tpms_pressure_rr":null - Formula	
+for an approximate result, multiply the pressure value by 14.504
+"gps_hdg":271.7,
+"curr_lat":30.635546,"curr_lat2":30.635546,"curr_lat_raw":30.635546,"curr_lon":-87.134476,"curr_lon2":-87.134476,"curr_lon_raw":-87.134476,
+"nav_lat":30.635534,"nav_lon":-87.134117
+"cfg_spoiler":"Passive"
+	"trip_chg_kwh": 8.866,
+	"trip_chg_miles": 25.81,
+	"trip_chg_whpm": 343.5,
+	EV_tripCharge_Start,77350.542
+EV_tripCharge_kWh,18.310
+EV_tripCurrent_Miles,3.012
+EV_tripCurrent_whpm,336.310
+VAPI_chargeTimeToFull
+GUI_chargeSessionIdealEnergyAdded
+-->
