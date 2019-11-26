@@ -1,1 +1,385 @@
-<!DOCTYPE html><html><head>  <title>Tesla Info Center</title>  <link href="info.css" media="screen" rel="stylesheet" type="text/css" />  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" /></head><body>	<div id="container">		<span>Loading...</span>	</div></body><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script><script>	var GET = {};	var query = window.location.search.substring(1).split("&");	for (var i = 0, max = query.length; i < max; i++)	{		if (query[i] === "") // check for trailing & with no param			continue;		var param = query[i].split("=");		GET[decodeURIComponent(param[0])] = decodeURIComponent(param[1] || "");	}	function convertToHHMM(info) {		var hrs = parseInt(Number(info));		var min = Math.round((Number(info)-hrs) * 60);		if (hrs > 0){return hrs+'h '+min+ 'm remaining';}		else {return min+ 'm remaining';}	}	if (GET.vin == "56510") {		port = "4036";	}	else {		port = "4035";	}	function getvitals(){		var json_lv = $.ajax({			url: "http://longdog-canon.ddns.net:8088/longdog.ddns.net:" + port + "/get_data_values",			async: false,			dataType: 'json',		}).responseText				json_lv = json_lv.replace(/"NAV_googlePolyline".*"NAV_gpsRecordingFile"/, '"NAV_gpsRecordingFile"')		//console.log(json_lv);		json_lv = jQuery.parseJSON(json_lv);		var json_raw = $.ajax({			url: "http://longdog-canon.ddns.net:8088/longdog.ddns.net:" + port + "/vitals?raw=true",			async: false,			dataType: 'json'		}).responseJSON;				var price = $.ajax({			url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,LTC,BCH&tsyms=USD",			async: false,			dataType: 'json'		}).responseJSON;		if (typeof(json_lv.GUI_vehicleName) == 'undefined') {			$('#container').load('hud.html', function(){				console.log("Failed to get data!");				$("#carName").html("No data");				$("#VIN").html("Try again later");			});		}				//DELETE		//json_lv.GTW_chargeState = "Charging"		document.title = json_lv.GUI_vehicleName + " Info"		console.log(json_lv.GUI_vehicleName);		if (json_lv.GTW_chargeState == "Charging") {			$('#container').load('charge.html', function(){				console.log("Charge happens!");				charge(json_lv, json_raw);				});		}		else {			$('#container').load('hud.html', function(){				console.log("Hud happens!");				hud(json_lv, json_raw, price);			});		}		if (json_lv.GUI_dayMode == "false") {				document.body.style.backgroundColor = "black";			} 		else {				document.body.style.backgroundColor = "#262729";			}		}	getvitals()	window.setInterval(getvitals, 10000);		function round(value, precision) {    var multiplier = Math.pow(10, precision || 0);    return Math.round(value * multiplier) / multiplier;}	function hud(lv, raw, price) {			$("#carName").html(lv.GUI_vehicleName);			$("#VIN").html(raw.vin);			$("#soe").html(Math.round(raw.SOE) + '<span class="mini_appends">&nbsp;%</span>');			$("#range").html(Math.round(raw.range) + '<span class="mini_appends">&nbsp;mi</span>');			$("#odometer").html(Math.round(raw.odo).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));			$("#trip_chg_miles").html(round(raw.trip_chg_miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");			$("#trip_chg_kwh").html(round(raw.trip_chg_kwh, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>kWh</p>");			$("#trip_chg_whpm").html(Math.round(raw.trip_chg_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");			$("#power_remaining").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2) + '<span class="mini_appends">&nbsp;kWh</span>');						if (lv.GUI_vehicleName == 'Tenebrae'){				$("#crypto_info").html("<span class='crypto_name'>BTC</span><span class='crypto_price'>" + price.BTC['USD'] + "</span><span class='crypto_name'>BCH</span><span class='crypto_price'>" + price.BCH['USD'] + "</span><span class='crypto_name'>ETH</span><span class='crypto_price'>" + price.ETH['USD'] + "</span><span class='crypto_name'>LTC</span><span class='crypto_price'>" + price.LTC['USD'] + "</span>");			}			//First thing we need is our hours slices for Start and End times			StartTime = lv.EV_tripCurrent_StartTime.slice((lv.EV_tripCurrent_StartTime.indexOf(":")-3), (lv.EV_tripCurrent_StartTime.indexOf(":")+3));			StartTimeHours = new Date(lv.EV_tripCurrent_StartTime).getHours();			StartTimeMinutes = new Date(lv.EV_tripCurrent_StartTime).getMinutes();			EndTime = lv.EV_tripCurrent_EndTime.slice((lv.EV_tripCurrent_EndTime.indexOf(":")-3), (lv.EV_tripCurrent_EndTime.indexOf(":")+3));			//console.log (lv.EV_tripCurrent_StartTime);			//console.log (StartTime + " /" + EndTime);			//Hour equation for UTC conversion			//If current hour conversion brings us back before midnight (<0)			utc_converted = raw.utcoffset/-3600;			//console.log("UTC Conversion: " + utc_converted)			if ((StartTimeHours - utc_converted) < 0) {				hours = ((StartTimeHours - utc_converted)+24);				console.log ("IF 1: " + hours);				}			//If hour conversion brings us forward of midnight (>24)				else if ((StartTimeHours - utc_converted) > 24) {				hours = ((StartTimeHours - utc_converted)-24);				console.log ("IF 2: " + hours);				}			else {				hours = (StartTimeHours - utc_converted);			}			ampm = " AM";			if(hours == 12) {				ampm = " PM";				}			if (hours == 0) {				hours = 12;				}			if (hours > 12) {				hours = hours-12;				ampm = " PM";			}							$("#sinceBlock").html("Since "+ hours + ":" + (StartTimeMinutes < 10 ? "0" : "") + StartTimeMinutes + ampm); 			console.log ("Current time " + raw.time);			var h = new Date(raw.time);			$("#EV_tripCurrent_Miles").html(round(lv.EV_tripCurrent_Miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");			//lv.EV_tripCurrent_EndTime = "<invalid>"			console.log(lv.EV_tripCurrent_EndTime);			if (lv.EV_tripCurrent_EndTime != "") {				var d1 = new Date(lv.EV_tripCurrent_EndTime);				var d2 = new Date(lv.EV_tripCurrent_StartTime);				var minutes = Math.round(((d1-d2)/1000)/60);			}			else {				var d1 = new Date(raw.time);				var d2 = new Date(lv.EV_tripCurrent_StartTime);				var minutes = Math.round(((d1-d2)/1000)/60)+300;							}						$("#EV_tripCurrent_Min").html(minutes +"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>min</p>");			$("#EV_tripCurrent_whpm").html(Math.round(lv.EV_tripCurrent_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");						var tpSensors = ['tl', 'tr', 'bl', 'br']			var rawSensors = [raw.tpms_pressure_fl, raw.tpms_pressure_fr, raw.tpms_pressure_rl, raw.tpms_pressure_rr]			for (var i = 0; i < tpSensors.length; i++) {				if (raw.tpms_pressure_fl == null) {					document.getElementById(tpSensors[i]).innerHTML = "--" + " psi";				}				else {					document.getElementById(tpSensors[i]).innerHTML = Math.round(rawSensors[i]*14.504) + " psi";					if (rawSensors[i]*14.504 <= 38) {document.getElementById(tpSensors[i]).style.color = "#c81e1e";}					else {document.getElementById(tpSensors[i]).style.color = "#d7d7d7"}				}			}			if (raw.cfg_sunroof == "Gen1") {				var image = document.getElementById("roof");				image.src = "assets/roof_pano.png";			}			if (raw.cfg_spoiler == "Passive") {				var image = document.getElementById("spoiler");				image.src = "assets/spoiler.png";			}			switch (raw.cfg_exteriorcolor) {				case "Black":					break;				case "SteelGrey":					document.getElementById("carColor").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";					document.getElementById("roof").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";					break;			}			//raw.SOE = 7;			if (raw.SOE > 20) {				document.getElementById("energyStore").style.width = Math.round(raw.SOE-1)+"px";				document.getElementById("energyStore").style.backgroundPosition = "4px 0px";				} else if (raw.SOE <= 20 && raw.SOE > 7) {					document.getElementById("energyStore").style.width = Math.round(raw.SOE)+"px";					document.getElementById("energyStore").style.backgroundPosition = "-92px 0px";				} else if (raw.SOE <= 7) {					document.getElementById("energyStore").style.width = Math.round(raw.SOE+6)+"px";					document.getElementById("energyStore").style.backgroundPosition = "-188px 0px";				}			//music_data			document.getElementById("album_cover").style.backgroundImage = "url('" + lv.GUI_nowPlayingImageHash.split('-', 1)[0] + "')";			$("#song_artist").html(lv.GUI_nowPlayingArtist);			$("#song_name").html(lv.GUI_nowPlayingTitle);			$("#album_name").html(lv.GUI_nowPlayingAlbum);			//Function to change song length in milliseconds to mmss			function minTommss(minutes){				 var sign = minutes < 0 ? "-" : "";				 var min = Math.floor(Math.abs(minutes));				 var sec = Math.floor((Math.abs(minutes) * 60) % 60);				 return sign + min + ":" + (sec < 10 ? "0" : "") + sec;			}						var sec = lv.GUI_nowPlayingElapsed/60000;			//console.log("Song time elapsed: " + lv.GUI_nowPlayingElapsed/60000)			sec = Math.floor((Math.abs(sec) * 60) % 60);			//console.log("Minutes: " + Math.floor(Math.abs(lv.GUI_nowPlayingElapsed/60000)));			function pad(val) {				return val > 9 ? val : "0" + val;			}			$("#minutes").html(Math.floor(Math.abs(lv.GUI_nowPlayingElapsed/60000)));			$("#seconds").html(pad(sec));			if (lv.GUI_nowPlayingElapsed > 0) {								var timer = setInterval(function () {					$("#minutes").html(Math.floor(Math.abs(lv.GUI_nowPlayingElapsed/60000)));					$("#seconds").html(pad(++sec));				}, 1000);				setTimeout(function () {					clearInterval(timer);				}, 10000);			}			//Insert song duration			$("#song_duration").html(minTommss(lv.GUI_nowPlayingDuration/60000));		  };	function charge(lv, raw){	//raw.SOE = 10;		console.log("Shoop! I'm a-chargin'");		$("#chargetitle").html(lv.GUI_vehicleName);					//document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";		$("#soe2").html(Math.round(raw.SOE));		$("#range2").html(Math.round(raw.range));		$("#energy_added").html("+ " + (lv.GUI_chargeSessionIdealEnergyAdded) + " kWh");		$("#chargeTimeRemaining").html(convertToHHMM(lv.VAPI_chargeTimeToFull));		$("#chg_current_total").html(((raw.chg_current_total*240)/1000).toFixed(2) + " kW");		$("#chg_volts").html(raw.chg_voltage_total + " V");		$("#chg_amps").html(raw.chg_current_total +" A");		$("#power_remaining2").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2));		document.getElementById("battery_mask_gradient").style.width = Math.round((raw.SOE/100)*325)+"px";		skew = (1+parseFloat((Math.round((raw.SOE/100)*22)).toFixed(2)));		console.log("skew is " + skew)		document.getElementById("battery_mask_gradient").style.webkitTransform = "skew(" + skew + "deg)";		document.getElementById("battery_mask_gradient").style.MozTransform = "skew(" + skew + "deg)";		document.getElementById("battery_mask_gradient").style.msTransform = "skew(" + skew + "deg)";		document.getElementById("battery_mask_gradient").style.OTransform = "skew(" + skew + "deg)";		document.getElementById("battery_mask_gradient").style.transform = "skew(" + skew + "deg)";				//lv.GUI_inSuperchargerGeofence = "true"		if (lv.GUI_inSuperchargerGeofence == "true") {			document.getElementById("battery_mask_gradient").style.background = 'linear-gradient(to right, #000f487d, #002dff9e)';			$("#chg_current_total").html(lv.VAPI_chargeAveragePower + " kW");			$("#chg_amps").html(lv.VAPI_batteryCurrent +" A");			console.log("True");		}	}	</script></html><!-- Important notes:"cfg_roof_color":"None""cfg_sunroof":"Gen1" for sunroof"cfg_exteriorcolor":"Black" for car color"tpms_pressure_fl":null,"tpms_pressure_fr":null,"tpms_pressure_rl":null,"tpms_pressure_rr":null - Formula	for an approximate result, multiply the pressure value by 14.504"gps_hdg":271.7,"curr_lat":30.635546,"curr_lat2":30.635546,"curr_lat_raw":30.635546,"curr_lon":-87.134476,"curr_lon2":-87.134476,"curr_lon_raw":-87.134476,"nav_lat":30.635534,"nav_lon":-87.134117"cfg_spoiler":"Passive"	"trip_chg_kwh": 8.866,	"trip_chg_miles": 25.81,	"trip_chg_whpm": 343.5,	EV_tripCharge_Start,77350.542EV_tripCharge_kWh,18.310EV_tripCurrent_Miles,3.012EV_tripCurrent_whpm,336.310VAPI_chargeTimeToFullGUI_chargeSessionIdealEnergyAdded-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tesla Info Center</title>
+    <link href="info.css" media="screen" rel="stylesheet" type="text/css" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <script src="../jquery.min.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="tesla stats">
+    <meta name="author" content="bobbybleacher">
+</head>
+<body>
+    <div id="container">
+        <span>Loading...</span>
+    </div>
+</body>
+
+<script>
+    var siteWidth = 1280;
+    var scale = screen.width //siteWidth
+
+    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'');
+    var GET = {};
+    var query = window.location.search.substring(1).split("&");
+    for (var i = 0, max = query.length; i < max; i++)
+    {
+        if (query[i] === "") // check for trailing & with no param
+            continue;
+
+        var param = query[i].split("=");
+        GET[decodeURIComponent(param[0])] = decodeURIComponent(param[1] || "");
+    }
+    function convertToHHMM(info) {
+        var hrs = parseInt(Number(info));
+        var min = Math.round((Number(info)-hrs) * 60);
+        if (hrs > 0){return hrs+'h '+min+ 'm remaining';}
+        else {return min+ 'm remaining';}
+    }
+    if (GET.vin == "56510") {
+        port = "4036";
+    }
+    else {
+        port = "4035";
+    }
+    
+    function getvitals(){
+        var json_lv = $.ajax({
+            url: "http://longdog-canon.ddns.net:8088/longdog.ddns.net:" + port + "/get_data_values",
+            async: false,
+            dataType: 'json',
+            timeout: 2000
+        }).responseText
+        
+        if (json_lv == null) {
+            json_lv = $.ajax({
+            url: "http://longdog.ddns.net:8088/longdog.ddns.net:" + port + "/get_data_values",
+            async: false,
+            dataType: 'json',
+        }).responseText
+        }
+        
+        json_lv = json_lv.replace(/"NAV_googlePolyline".*"NAV_gpsRecordingFile"/, '"NAV_gpsRecordingFile"')
+        //console.log(json_lv);
+        json_lv = jQuery.parseJSON(json_lv);
+        var json_raw = $.ajax({
+            url: "http://longdog-canon.ddns.net:8088/longdog.ddns.net:" + port + "/vitals?raw=true",
+            async: false,
+            dataType: 'json',
+            timeout: 2000
+        }).responseJSON;
+        
+        if (json_raw == null) {
+            json_raw = $.ajax({
+            url: "http://longdog.ddns.net:8088/longdog.ddns.net:" + port + "/vitals?raw=true",
+            async: false,
+            dataType: 'json',
+        }).responseJSON
+        }
+        
+        var neurio_json = $.ajax({
+            url: "http://longdog-canon.ddns.net:8088/http://longdog-canon.ddns.net:7005/current-sample",
+            async: false,
+            dataType: "json",
+        }).responseJSON
+        
+        if (neurio_json == null) {
+            neurio_json = $.ajax({
+            url: "http://longdog.ddns.net:8088/http://longdog-canon.ddns.net:7005/current-sample",
+            async: false,
+            dataType: 'json',
+        }).responseJSON
+        }
+        
+        var price = $.ajax({
+            url: "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,LTC,BCH,ETC&tsyms=USD",
+            async: false,
+            dataType: 'json'
+        }).responseJSON;
+
+
+        if (typeof(json_lv.GUI_vehicleName) == 'undefined') {
+            $('#container').load('hud.html', function(){
+                console.log("Failed to get data!");
+                $("#carName").html("No data");
+                $("#VIN").html("Try again later");
+            });
+        }
+        
+        
+        //DELETE
+        //json_lv.GTW_chargeState = "Charging"
+        document.title = json_lv.GUI_vehicleName + " Info - " + Math.round(json_raw.SOE) + "%"
+        console.log(json_lv.GUI_vehicleName);
+        if (json_lv.GTW_chargeState == "Charging") {
+            $('#container').load('charge.html', function(){
+                console.log("Charge happens!");
+                charge(json_lv, json_raw);    
+            });
+        }
+        else {
+            $('#container').load('hud.html', function(){
+                console.log("Hud happens!");
+                hud(json_lv, json_raw, price, neurio_json);
+            });
+        }
+        if (json_lv.GUI_dayMode == "false") {
+                document.body.style.backgroundColor = "black";
+            } 
+        else {
+                document.body.style.backgroundColor = "#262729";
+            }
+        }
+    getvitals();
+    window.setInterval(getvitals, 10000);
+    
+    function round(value, precision) {
+        var multiplier = Math.pow(10, precision || 0);
+        return Math.round(value * multiplier) / multiplier;
+    }
+    function getSoC() {
+    var batt_json = $.ajax({
+            url: "http://longdog-canon.ddns.net:8088/http://longdog-canon.ddns.net:5000/solar",
+            async: false,
+            dataType: "json",
+            timeout: 2000
+        }).responseJSON
+    if (batt_json != null) {
+        sum = 0
+            for (var i = 0; i < 10; i++) {
+                for (var x = 1; x < 7; x++) {
+                    sum += parseFloat(batt_json.packs[i]["c" + x]);
+                    //console.log(sum);
+                };
+            };
+        sum = (sum/5);
+        return sum;
+    }
+    else {
+        return "Offline";
+        }
+    };
+    function hud(lv, raw, price, neurio_data) {
+            $("#carName").html(lv.GUI_vehicleName);
+            $("#VIN").html(raw.vin);
+            $("#soe").html(Math.round(raw.SOE) + '<span class="mini_appends">&nbsp;%</span>');
+            $("#range").html(Math.round(raw.range) + '<span class="mini_appends">&nbsp;mi</span>');
+            $("#odometer").html(Math.round(raw.odo).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            $("#trip_chg_miles").html(round(raw.trip_chg_miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
+            $("#trip_chg_kwh").html(round(raw.trip_chg_kwh, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>kWh</p>");
+            $("#trip_chg_whpm").html(Math.round(raw.trip_chg_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
+            $("#power_remaining").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2) + '<span class="mini_appends">&nbsp;kWh</span>');
+            
+            if (lv.GUI_vehicleName == 'Tenebrae'){
+                avg = getSoC();
+                $("#crypto_info").html("<span class='crypto_name'>BTC</span><span class='crypto_price'>" + 
+                price.BTC['USD'].toFixed(2) + "</span><span class='crypto_name'>BCH</span><span class='crypto_price'>" + 
+                price.BCH['USD'].toFixed(2) + "</span><span class='crypto_name'>ETH</span><span class='crypto_price'>" + 
+                price.ETH['USD'].toFixed(2) + "</span><span class='crypto_name'>LTC</span><span class='crypto_price'>" + 
+                price.LTC['USD'].toFixed(2) + "</span><span class='crypto_name'>ETC</span><span class='crypto_price'>" + 
+                price.ETC['USD'].toFixed(2) + "</span><span class='crypto_name'>LDPP</span><span class='crypto_price'>" + 
+                round(avg, 2) + "V | " + round((avg - 38.75)*8.58) + "%</span><span class='crypto_name'>Gen/Load</span><span class='crypto_price'>" + 
+                neurio_data['channels'][3]['p_W'] + "W | " + (neurio_data['channels'][4]['p_W']+280) + "W</span>");
+            }
+
+            //First thing we need is our hours slices for Start and End times
+            StartTime = lv.EV_tripCurrent_StartTime.slice((lv.EV_tripCurrent_StartTime.indexOf(":")-3), (lv.EV_tripCurrent_StartTime.indexOf(":")+3));
+            StartTimeHours = new Date(lv.EV_tripCurrent_StartTime).getHours();
+            StartTimeMinutes = new Date(lv.EV_tripCurrent_StartTime).getMinutes();
+            EndTime = lv.EV_tripCurrent_EndTime.slice((lv.EV_tripCurrent_EndTime.indexOf(":")-3), (lv.EV_tripCurrent_EndTime.indexOf(":")+3));
+
+            //console.log (lv.EV_tripCurrent_StartTime);
+            //console.log (StartTime + " /" + EndTime);
+            //Hour equation for UTC conversion
+            //If current hour conversion brings us back before midnight (<0)
+
+            utc_converted = raw.utcoffset/-3600;
+            //utc_converted = raw.utcoffset
+            //write in smart offset for dst stuff
+
+            //console.log("UTC Conversion: " + utc_converted)
+            if ((StartTimeHours - utc_converted) < 0) {
+                hours = ((StartTimeHours - utc_converted)+24);
+                console.log ("IF 1: " + hours);
+                }
+            //If hour conversion brings us forward of midnight (>24)    
+            else if ((StartTimeHours - utc_converted) > 24) {
+                hours = ((StartTimeHours - utc_converted)-24);
+                console.log ("IF 2: " + hours);
+                }
+            else {
+                hours = (StartTimeHours - utc_converted);
+            }
+            ampm = " AM";
+            if(hours == 12) {
+                ampm = " PM";
+                }
+            if (hours == 0) {
+                hours = 12;    
+            }
+            if (hours > 12) {
+                hours = hours-12;
+                ampm = " PM";
+            }
+                
+            $("#sinceBlock").html("Since "+ hours + ":" + (StartTimeMinutes < 10 ? "0" : "") + StartTimeMinutes + ampm); 
+
+            console.log ("Current time " + raw.time);
+            var h = new Date(raw.time);
+
+            $("#EV_tripCurrent_Miles").html(round(lv.EV_tripCurrent_Miles, 1)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>mi</p>");
+            //lv.EV_tripCurrent_EndTime = "<invalid>"
+            console.log(lv.EV_tripCurrent_EndTime);
+            if (lv.EV_tripCurrent_EndTime != "") {
+                var d1 = new Date(lv.EV_tripCurrent_EndTime);
+                var d2 = new Date(lv.EV_tripCurrent_StartTime);
+                var minutes = Math.round(((d1-d2)/1000)/60);
+            }
+            else {
+                var d1 = new Date(raw.time);
+                //Standard time
+                d1 = d1.setHours(d1.getHours()+1);
+                var d2 = new Date(lv.EV_tripCurrent_StartTime);
+                var minutes = Math.round(((d1-d2)/1000)/60)+300;
+                
+            }
+            
+            $("#EV_tripCurrent_Min").html(minutes +"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>min</p>");
+            $("#EV_tripCurrent_whpm").html(Math.round(lv.EV_tripCurrent_whpm)+"<br /><p style='margin: 0 auto;font-size:14px;color:gray;'>Wh/mi</p>");
+            
+            var tpSensors = ['tl', 'tr', 'bl', 'br']
+            var rawSensors = [raw.tpms_pressure_fl, raw.tpms_pressure_fr, raw.tpms_pressure_rl, raw.tpms_pressure_rr]
+            for (var i = 0; i < tpSensors.length; i++) {
+                if (raw.tpms_pressure_fl == null) {
+                    document.getElementById(tpSensors[i]).innerHTML = "--" + " psi";
+                }
+                else {
+                    document.getElementById(tpSensors[i]).innerHTML = Math.round(rawSensors[i]*14.504) + " psi";
+                    if (rawSensors[i]*14.504 <= 38) {document.getElementById(tpSensors[i]).style.color = "#c81e1e";}
+                    else {document.getElementById(tpSensors[i]).style.color = "#d7d7d7"}
+                }
+            }
+            if (raw.cfg_sunroof == "Gen1") {
+                var image = document.getElementById("roof");
+                image.src = "assets/roof_pano.png";
+            }
+            if (raw.cfg_spoiler == "Passive") {
+                var image = document.getElementById("spoiler");
+                image.src = "assets/spoiler.png";
+            }
+            switch (raw.cfg_exteriorcolor) {
+                case "Black":
+                    break;
+                case "SteelGrey":
+                    document.getElementById("carColor").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";
+                    document.getElementById("roof").style.filter = "opacity(.1) drop-shadow(0 0 0 gray)";
+                    break;
+            }
+            //raw.SOE = 7;
+            if (raw.SOE > 20) {
+                document.getElementById("energyStore").style.width = Math.round(raw.SOE-1)+"px";
+                document.getElementById("energyStore").style.backgroundPosition = "4px 0px";
+                } else if (raw.SOE <= 20 && raw.SOE > 7) {
+                    document.getElementById("energyStore").style.width = Math.round(raw.SOE)+"px";
+                    document.getElementById("energyStore").style.backgroundPosition = "-92px 0px";
+                } else if (raw.SOE <= 7) {
+                    document.getElementById("energyStore").style.width = Math.round(raw.SOE+6)+"px";
+                    document.getElementById("energyStore").style.backgroundPosition = "-188px 0px";
+                }
+            //music_data
+            document.getElementById("album_cover").style.backgroundImage = "url('" + lv.GUI_nowPlayingImageHash.split('-', 1)[0] + "')";
+            $("#song_artist").html(lv.GUI_nowPlayingArtist);
+            $("#song_name").html(lv.GUI_nowPlayingTitle);
+            $("#album_name").html(lv.GUI_nowPlayingAlbum);
+            //Function to change song length in milliseconds to mmss
+            function minTommss(minutes){
+                 var sign = minutes < 0 ? "-" : "";
+                 var min = Math.floor(Math.abs(minutes));
+                 var sec = Math.floor((Math.abs(minutes) * 60) % 60);
+                 return sign + min + ":" + (sec < 10 ? "0" : "") + sec;
+            }
+            
+            var sec = lv.GUI_nowPlayingElapsed/60000;
+            //console.log("Song time elapsed: " + lv.GUI_nowPlayingElapsed/60000)
+            sec = Math.floor((Math.abs(sec) * 60) % 60);
+            //console.log("Minutes: " + Math.floor(Math.abs(lv.GUI_nowPlayingElapsed/60000)));
+
+            function pad(val) {
+                return val > 9 ? val : "0" + val;
+            }
+            $("#minutes").html(Math.floor(Math.abs(lv.GUI_nowPlayingElapsed/60000)));
+            $("#seconds").html(pad(sec));
+            if (lv.GUI_nowPlayingElapsed > 0) {
+                
+                var timer = setInterval(function () {
+                    $("#minutes").html(Math.floor(Math.abs(lv.GUI_nowPlayingElapsed/60000)));
+                    $("#seconds").html(pad(++sec));
+                }, 1000);
+
+                setTimeout(function () {
+                    clearInterval(timer);
+                }, 10000);
+            }
+            //Insert song duration
+            $("#song_duration").html(minTommss(lv.GUI_nowPlayingDuration/60000));
+          };
+    function charge(lv, raw){
+    //raw.SOE = 10;
+        console.log("Shoop! I'm a-chargin'");
+        $("#chargetitle").html(lv.GUI_vehicleName);
+                    //document.getElementById("chargeSymbol").style.backgroundImage = "url('assets/bolt.png')";
+        $("#soe2").html(Math.round(raw.SOE));
+        $("#range2").html(Math.round(raw.range));
+        $("#max_charge").html("Max Charge " + lv.GUI_chargeLimitRequest + "%");
+        $("#energy_added").html("+ " + (lv.GUI_chargeSessionIdealEnergyAdded) + " kWh");
+        $("#chargeTimeRemaining").html(convertToHHMM(lv.VAPI_chargeTimeToFull));
+        $("#chg_current_total").html(((raw.chg_current_total*240)/1000).toFixed(2) + " kW");
+        $("#chg_volts").html(raw.chg_voltage_total + " V");
+        $("#chg_amps").html(raw.chg_current_total +" A");
+        $("#power_remaining2").html((raw.bms_nominal_fullpack*(raw.SOE/100)).toFixed(2));
+        document.getElementById("battery_mask_gradient").style.width = Math.round((raw.SOE/100)*325)+"px";
+        skew = (1+parseFloat((Math.round((raw.SOE/100)*22)).toFixed(2)));
+        console.log("skew is " + skew)
+        $('#battery_mask_gradient').css({
+        '-webkit-transform' : 'skew(' + skew + 'deg)',
+        '-moz-transform'    : 'skew(' + skew + 'deg)',
+        '-ms-transform'     : 'skew(' + skew + 'deg)',
+        '-o-transform'      : 'skew(' + skew + 'deg)',
+        'transform'         : 'skew(' + skew + 'deg)'
+        });
+        
+        
+        //lv.GUI_inSuperchargerGeofence = "true"
+        if (lv.GUI_inSuperchargerGeofence == "true") {
+            document.getElementById("battery_mask_gradient").style.background = 'linear-gradient(to right, #000f487d, #002dff9e)';
+            $("#chg_current_total").html(lv.VAPI_chargeAveragePower + " kW");
+            $("#chg_amps").html(lv.VAPI_batteryCurrent +" A");
+            console.log("True");
+        }
+    }
+    </script>
+</html>
+
+<!-- 
+Important notes:
+"cfg_roof_color":"None"
+"cfg_sunroof":"Gen1" for sunroof
+"cfg_exteriorcolor":"Black" for car color
+"tpms_pressure_fl":null,"tpms_pressure_fr":null,"tpms_pressure_rl":null,"tpms_pressure_rr":null - Formula    
+for an approximate result, multiply the pressure value by 14.504
+"gps_hdg":271.7,
+"curr_lat":30.635546,"curr_lat2":30.635546,"curr_lat_raw":30.635546,"curr_lon":-87.134476,"curr_lon2":-87.134476,"curr_lon_raw":-87.134476,
+"nav_lat":30.635534,"nav_lon":-87.134117
+"cfg_spoiler":"Passive"
+    "trip_chg_kwh": 8.866,
+    "trip_chg_miles": 25.81,
+    "trip_chg_whpm": 343.5,
+    EV_tripCharge_Start,77350.542
+EV_tripCharge_kWh,18.310
+EV_tripCurrent_Miles,3.012
+EV_tripCurrent_whpm,336.310
+VAPI_chargeTimeToFull
+GUI_chargeSessionIdealEnergyAdded
+-->

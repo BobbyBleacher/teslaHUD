@@ -69,8 +69,23 @@ p {
 	text-align: center;
 	font-size: 22px;
 	font-family: 'Gotham Book';
+	margin: 0px;
+	padding: 1px;
 }
-
+#crypto_info{
+	margin: 0 auto;
+	width:250px;
+	font-size: .85em;
+}
+.crypto_name{
+	display:block;
+	float:left;
+	text-align: left;
+}
+.crypto_price{
+	display:block;
+	text-align: right;
+}
 div.TL {
 	position: relative;
 	top: 75px;
@@ -195,7 +210,7 @@ div.car {
 #music_container {
 	height: 180px;
 	width: 500px;
-	margin: 50px 40px;
+	margin: 15px 40px;
 	display: inline-block;
 	/*border: 3px solid #FFFFFF;*/
 }
@@ -365,10 +380,10 @@ img.carRoof {
 	height: 96px;
 	position: absolute;
 	left: -18px;
-	-webkit-transform: skew(22deg, 0deg);
-        -ms-transform: skew(22deg, 0deg);
-         -o-transform: skew(22deg, 0deg);
-            transform: skew(22deg, 0deg);
+	-webkit-transform: skew(23deg, 0deg);
+        -ms-transform: skew(23deg, 0deg);
+         -o-transform: skew(23deg, 0deg);
+            transform: skew(23deg, 0deg);
 }
 #namecontainer{
 	text-align: center;
@@ -379,7 +394,7 @@ img.carRoof {
 	margin: 30px 0px 0px 0px;
 }
 #chargingdata {
-	margin: 50px auto;
+	margin: 30px auto;
 	text-align: center;
 	font-weight: bold;
 	font-size: 30px;
