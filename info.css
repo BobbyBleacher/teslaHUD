@@ -1,455 +1,455 @@
-@font-face {
-font-family: 'Gotham Book';
-font-style: normal;
-font-weight: normal;
-src: local('Gotham Book'), url('assets/fonts/GothamBook.woff') format('woff');
-}
-
-html {
-  font-family: 'Gotham Book';
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  font-family: 'Gotham Book';
-  font-size: 18px;
-  line-height: 1.42857143;
-  background-color: #262729;
-}
-
-html, body {
-  color: #d7d7d7;
-}
-#container {
-	width:1050px;
-	margin: 0 auto;
-	position: relative;
-}
-.odolines {
-	display: inline-block;
-	margin: 10px 15px 5px 15px;
-	border-style: inset;
-	border-width: 1px;
-	width: 92px;
-	color:gray;
-}
-.trip_chg_lines{
-	display: inline-block;
-	margin: 10px 15px 5px 15px;
-	border-style: inset;
-	border-width: 1px;
-	width: 63px;
-	color:gray;
-}
-div.vitals {
-	/*border: 3px solid #FFFFFF;*/
-	width: 525px;
-	margin: 0 auto;
-	display: inline-block;
-	
-}
-#odoWrapper {
-	width: 525px;
-	margin: 0 auto;
-	display: inline-block;
-	text-align: center;
-	position: absolute;
-
-}
-p {
-	font-family: 'Gotham Book';
-}
-#carName {
-	text-align: center;
-	font-size: 24px;
-	font-family: 'Gotham Book';
-}
-#VIN {
-	text-align: center;
-	font-size: 22px;
-	font-family: 'Gotham Book';
-	margin: 0px;
-	padding: 1px;
-}
-#crypto_info{
-	margin: 0 auto;
-	width:250px;
-	font-size: .85em;
-}
-.crypto_name{
-	display:block;
-	float:left;
-	text-align: left;
-}
-.crypto_price{
-	display:block;
-	text-align: right;
-}
-div.TL {
-	position: relative;
-	top: 75px;
-	left: 0px;
-	width: 100px;
-	height: 50px;
-	/*border: 3px solid #FFFFFF;*/
-	float: left;
-	margin: auto;
-	text-align: center;
-	vertical-align: middle;
-	line-height: 50px;
-	font-size: 20px;
-}
-div.BL {
-	position: absolute;
-	top: 400px;
-	left: 0px;
-	width: 100px;
-	height: 50px;
-	/*border: 3px solid #FFFFFF;*/
-	float: left;
-	margin: auto;
-	text-align: center;
-	vertical-align: middle;
-	line-height: 50px;
-	font-size: 20px;
-}
-div.TR {
-	position: absolute;
-	top: 75px;
-	left: 345px;
-	width: 100px;
-	height: 50px;
-	/*border: 3px solid white;*/
-	float: left;
-	margin: auto;
-	text-align: center;
-	vertical-align: middle;
-	line-height: 50px;
-	font-size: 20px;
-}
-div.BR {
-	position: absolute;
-	top: 400px;
-	left: 345px;
-	width: 100px;
-	height: 50px;
-	/*border: 3px solid white;*/
-	float: left;
-	margin: auto;
-	text-align: center;
-	vertical-align: middle;
-	line-height: 50px;
-	font-size: 20px;
-}
-div.car {
-	position: relative;
-	
-}
-#TPMS {
-	width: 450px;
-	height: 519px;
-	/*border: 3px solid #FFFFFF;*/
-	background: url(assets/car.png);
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	position: relative;
-	margin: 0 auto;
-}
-#carBodyShadow {
-	width: 450px;
-	height: 519px;
-	#border: 3px solid #FFFFFF;
-	background: url(assets/shadow_cluster.png);
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	position: relative;
-	margin: 0 auto;
-}
-#battery_stats {
-	#border: 3px solid red;
-	position: relative;
-	margin-top: 30px;
-	#line-height: 0px;
-}
-#batteryWrapper {
-	height: 39px;
-	#border: 3px solid blue;
-	width: 108px;
-	display: inline-block;
-	vertical-align:middle;
-	z-index: 0;
-}
-#batteryBG {
-	height: 33px;
-	width: 102px;
-	position: absolute;
-	top: 3px;
-	left: 6px;
-	z-index: 1;
-	#border: 3px solid #FF0000;
-}
-#energyStore {
-	background: url(assets/battery_color_sprite.png) 0 0 no-repeat;
-	height: 39px;
-	z-index:2;
-	position:absolute;
-	left: 4px;
-}
-#soe, #range, #power_remaining, #battery_graphic{
-	font-weight:bold;
-	font-size:22px;
-	display:inline-block;
-	width: 22%;
-	height: 40px;
-	text-align:center;
-}
-#power_remaining{
-	width: 150px;
-}
-#music_container {
-	height: 180px;
-	width: 500px;
-	margin: 15px 40px;
-	display: inline-block;
-	/*border: 3px solid #FFFFFF;*/
-}
-#album_cover {
-	background: url(assets/battery_color_bg.png);
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	background-size: 180px 180px;
-	width:180px;
-	height: 180px;
-	position: relative;
-	top: 0;
-	left: 0;
-	display: inline-block;
-	float:left;
-}
-#music_data {
-	#border: 3px solid red;
-	margin: 35px auto 0;
-}
-div.car {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-#carColor {
-	/*-webkit-filter: opacity(.5) drop-shadow(0 0 0 pink);
-	filter: opacity(.5) drop-shadow(0 0 0 pink);*/
-}
-img.carRoof {
-	position: absolute;
-	top: 226px;
-	left: 158px;
-}
-#spoiler{
-	position: absolute;
-	top: 483px;
-	left: 172px;
-}
-
-#range, #soe, #batteryWrapper{
-	text-align: center;
-}
-#VIN {
-	margin-left:auto;
-	margin-bottom:100px;
-}
-#ghost{
-	margin: 0 auto;
-	width: 800px;
-	height: 300px;
-	text-align: center;
-	#border: 3px solid blue
-
-}
-.shadow{
-	position:absolute;
-	z-index: 1;
-	top: 310px;
-	left: 185px
-	
-}
-.wheels{
-	position:absolute;
-	z-index: 3;
-	top: 260px;
-	left: 230px;
-}
-.battery{
-	position:absolute;
-	z-index: -2;
-	top: 312px;
-	left: 292px;
-}
-.shell{
-	position:absolute;
-	z-index: -4;
-	top: 190px;
-	left: 165px;
-}
-.cable{
-	position:absolute;
-	top: 360px;
-	left: 810px;
-}
-#port {
-	background: url(assets/charge_port_colors_US.png) no-repeat -90px 0px;
-	width:30px;
-	height:41px;
-	position:absolute;
-	top: 340px;
-	left: 835px;
-}
-#batterybgleft {
-	background: url(assets/battery_background.png) no-repeat 0 0;
-	width:30px;
-	height:100px;
-	position:absolute;
-	top: 333px;
-	left: 350px;
-}
-#batterybgmiddle {
-	background: url(assets/battery_background_slice.png) repeat-x 0 0;
-	width: 268px;
-	height: 100px;
-	position:absolute;
-	top: 333px;
-	left:380px;
-}
-#batterybgright {
-	background: url(assets/battery_background.png) no-repeat -30px 0;
-	width:32px;
-	height:100px;
-	position:absolute;
-	top: 333px;
-	left:648px;
-}
-#battery_mask_left, #battery_mask_middle, #battery_mask_right{
-	-webkit-filter: opacity(.4);
-	filter: opacity(.4);
-}
-#battery_mask_left {
-	background: url(assets/battery_mask.png) no-repeat 0 0;
-	width:30px;
-	height:100px;
-	position:absolute;
-	top: 333px;
-	left: 350px;
-}
-#battery_mask_middle{
-	background: url(assets/battery_mask_slice.png) repeat-x 0 0;
-	width: 268px;
-	height: 100px;
-	position:absolute;
-	top: 333px;
-	left:380px;
-}
-#battery_mask_right{
-	background: url(assets/battery_mask.png) no-repeat -30px 0;
-	width:32px;
-	height:100px;
-	position:absolute;
-	top: 333px;
-	left:648px;
-}
-#mask_container{
-	position: absolute;
-	top: 335px;
-	left: 363px;
-	width: 330px;
-	height: 96px;
-	border-radius: 6px;
-	overflow: hidden;
-	-webkit-transform: skew(-14deg, 0deg);
-    -ms-transform: skew(-14deg, 0deg);
-    -o-transform: skew(-14deg, 0deg);
-    transform: skew(-14deg, 0deg);
-}
-#battery_mask_gradient{
-	#background: linear-gradient(to right, crimson, dodgerblue);
-	background: linear-gradient(to right, #324a2a7d, #20bb009e);
-	border-radius: 4px;
-	display: inline-block;
-	#overflow: hidden;
-	width: 341px;
-	height: 96px;
-	position: absolute;
-	left: -18px;
-	-webkit-transform: skew(23deg, 0deg);
-        -ms-transform: skew(23deg, 0deg);
-         -o-transform: skew(23deg, 0deg);
-            transform: skew(23deg, 0deg);
-}
-#namecontainer{
-	text-align: center;
-}
-#chargetitle{
-	font-weight: bold;
-	font-size: 46pt;
-	margin: 30px 0px 0px 0px;
-}
-#chargingdata {
-	margin: 30px auto;
-	text-align: center;
-	font-weight: bold;
-	font-size: 30px;
-}
-#soe2 {
-	font-size: 46pt;
-	font-weight: bold;
-	margin: 0;
-	padding: 0;
-}
-#range2{
-	font-size: 46pt;
-	font-weight: bold;
-	display:inline-block;
-}
-#power_remaining2{
-	font-size: 46pt;
-	font-weight: bold;
-	display:inline-block;
-}
-#soe2container{
-	width: 750px;
-	height: 70px;
-	margin: 0 auto;
-	text-align: center;
-	#border: 1px solid white;
-	#overflow:scroll;
-}
-.appends {
-	font-size:22pt;
-	color:#a9a9a9;
-	display:inline-block;
-	position:relative;
-	margin: 0;
-	padding: 0;
-}
-.mini_appends {
-	font-size:14pt;
-	color:#a9a9a9;
-	display:inline-block;
-	margin: 0;
-	padding: 0;
-}
-rect {
-    cursor: pointer;
-    #shape-rendering: crispEdges;
-	border-radius: 30px;
-    fill: url(#MyGradient);
-}
-#svg_bar {
-	width:298px;
-	height:96px;
-	-webkit-filter: opacity(.95);
-	filter: opacity(.95);
-	position: absolute;
-	top: 335px;
-	left: 350px;
+@font-face {
+font-family: 'Gotham Book';
+font-style: normal;
+font-weight: normal;
+src: local('Gotham Book'), url('assets/fonts/GothamBook.woff') format('woff');
+}
+
+html {
+  font-family: 'Gotham Book';
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Gotham Book';
+  font-size: 18px;
+  line-height: 1.42857143;
+  background-color: #262729;
+}
+
+html, body {
+  color: #d7d7d7;
+}
+#container {
+	width:1050px;
+	margin: 0 auto;
+	position: relative;
+}
+.odolines {
+	display: inline-block;
+	margin: 10px 15px 5px 15px;
+	border-style: inset;
+	border-width: 1px;
+	width: 92px;
+	color:gray;
+}
+.trip_chg_lines{
+	display: inline-block;
+	margin: 10px 15px 5px 15px;
+	border-style: inset;
+	border-width: 1px;
+	width: 63px;
+	color:gray;
+}
+div.vitals {
+	/*border: 3px solid #FFFFFF;*/
+	width: 525px;
+	margin: 0 auto;
+	display: inline-block;
+	
+}
+#odoWrapper {
+	width: 525px;
+	margin: 0 auto;
+	display: inline-block;
+	text-align: center;
+	position: absolute;
+
+}
+p {
+	font-family: 'Gotham Book';
+}
+#carName {
+	text-align: center;
+	font-size: 24px;
+	font-family: 'Gotham Book';
+}
+#VIN {
+	text-align: center;
+	font-size: 22px;
+	font-family: 'Gotham Book';
+	margin: 0px;
+	padding: 1px;
+}
+#crypto_info{
+	margin: 0 auto;
+	width:250px;
+	font-size: .85em;
+}
+.crypto_name{
+	display:block;
+	float:left;
+	text-align: left;
+}
+.crypto_price{
+	display:block;
+	text-align: right;
+}
+div.TL {
+	position: relative;
+	top: 75px;
+	left: 0px;
+	width: 100px;
+	height: 50px;
+	/*border: 3px solid #FFFFFF;*/
+	float: left;
+	margin: auto;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+	font-size: 20px;
+}
+div.BL {
+	position: absolute;
+	top: 400px;
+	left: 0px;
+	width: 100px;
+	height: 50px;
+	/*border: 3px solid #FFFFFF;*/
+	float: left;
+	margin: auto;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+	font-size: 20px;
+}
+div.TR {
+	position: absolute;
+	top: 75px;
+	left: 345px;
+	width: 100px;
+	height: 50px;
+	/*border: 3px solid white;*/
+	float: left;
+	margin: auto;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+	font-size: 20px;
+}
+div.BR {
+	position: absolute;
+	top: 400px;
+	left: 345px;
+	width: 100px;
+	height: 50px;
+	/*border: 3px solid white;*/
+	float: left;
+	margin: auto;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 50px;
+	font-size: 20px;
+}
+div.car {
+	position: relative;
+	
+}
+#TPMS {
+	width: 450px;
+	height: 519px;
+	/*border: 3px solid #FFFFFF;*/
+	background: url(assets/car.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	position: relative;
+	margin: 0 auto;
+}
+#carBodyShadow {
+	width: 450px;
+	height: 519px;
+	#border: 3px solid #FFFFFF;
+	background: url(assets/shadow_cluster.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	position: relative;
+	margin: 0 auto;
+}
+#battery_stats {
+	#border: 3px solid red;
+	position: relative;
+	margin-top: 30px;
+	#line-height: 0px;
+}
+#batteryWrapper {
+	height: 39px;
+	#border: 3px solid blue;
+	width: 108px;
+	display: inline-block;
+	vertical-align:middle;
+	z-index: 0;
+}
+#batteryBG {
+	height: 33px;
+	width: 102px;
+	position: absolute;
+	top: 3px;
+	left: 6px;
+	z-index: 1;
+	#border: 3px solid #FF0000;
+}
+#energyStore {
+	background: url(assets/battery_color_sprite.png) 0 0 no-repeat;
+	height: 39px;
+	z-index:2;
+	position:absolute;
+	left: 4px;
+}
+#soe, #range, #power_remaining, #battery_graphic{
+	font-weight:bold;
+	font-size:22px;
+	display:inline-block;
+	width: 22%;
+	height: 40px;
+	text-align:center;
+}
+#power_remaining{
+	width: 150px;
+}
+#music_container {
+	height: 180px;
+	width: 500px;
+	margin: 15px 40px;
+	display: inline-block;
+	/*border: 3px solid #FFFFFF;*/
+}
+#album_cover {
+	background: url(assets/battery_color_bg.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-size: 180px 180px;
+	width:180px;
+	height: 180px;
+	position: relative;
+	top: 0;
+	left: 0;
+	display: inline-block;
+	float:left;
+}
+#music_data {
+	#border: 3px solid red;
+	margin: 35px auto 0;
+}
+div.car {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#carColor {
+	/*-webkit-filter: opacity(.5) drop-shadow(0 0 0 pink);
+	filter: opacity(.5) drop-shadow(0 0 0 pink);*/
+}
+img.carRoof {
+	position: absolute;
+	top: 226px;
+	left: 158px;
+}
+#spoiler{
+	position: absolute;
+	top: 483px;
+	left: 172px;
+}
+
+#range, #soe, #batteryWrapper{
+	text-align: center;
+}
+#VIN {
+	margin-left:auto;
+	margin-bottom:100px;
+}
+#ghost{
+	margin: 0 auto;
+	width: 800px;
+	height: 300px;
+	text-align: center;
+	#border: 3px solid blue
+
+}
+.shadow{
+	position:absolute;
+	z-index: 1;
+	top: 310px;
+	left: 185px
+	
+}
+.wheels{
+	position:absolute;
+	z-index: 3;
+	top: 260px;
+	left: 230px;
+}
+.battery{
+	position:absolute;
+	z-index: -2;
+	top: 312px;
+	left: 292px;
+}
+.shell{
+	position:absolute;
+	z-index: -4;
+	top: 190px;
+	left: 165px;
+}
+.cable{
+	position:absolute;
+	top: 360px;
+	left: 810px;
+}
+#port {
+	background: url(assets/charge_port_colors_US.png) no-repeat -90px 0px;
+	width:30px;
+	height:41px;
+	position:absolute;
+	top: 340px;
+	left: 835px;
+}
+#batterybgleft {
+	background: url(assets/battery_background.png) no-repeat 0 0;
+	width:30px;
+	height:100px;
+	position:absolute;
+	top: 333px;
+	left: 350px;
+}
+#batterybgmiddle {
+	background: url(assets/battery_background_slice.png) repeat-x 0 0;
+	width: 268px;
+	height: 100px;
+	position:absolute;
+	top: 333px;
+	left:380px;
+}
+#batterybgright {
+	background: url(assets/battery_background.png) no-repeat -30px 0;
+	width:32px;
+	height:100px;
+	position:absolute;
+	top: 333px;
+	left:648px;
+}
+#battery_mask_left, #battery_mask_middle, #battery_mask_right{
+	-webkit-filter: opacity(.4);
+	filter: opacity(.4);
+}
+#battery_mask_left {
+	background: url(assets/battery_mask.png) no-repeat 0 0;
+	width:30px;
+	height:100px;
+	position:absolute;
+	top: 333px;
+	left: 350px;
+}
+#battery_mask_middle{
+	background: url(assets/battery_mask_slice.png) repeat-x 0 0;
+	width: 268px;
+	height: 100px;
+	position:absolute;
+	top: 333px;
+	left:380px;
+}
+#battery_mask_right{
+	background: url(assets/battery_mask.png) no-repeat -30px 0;
+	width:32px;
+	height:100px;
+	position:absolute;
+	top: 333px;
+	left:648px;
+}
+#mask_container{
+	position: absolute;
+	top: 335px;
+	left: 363px;
+	width: 330px;
+	height: 96px;
+	border-radius: 6px;
+	overflow: hidden;
+	-webkit-transform: skew(-14deg, 0deg);
+    -ms-transform: skew(-14deg, 0deg);
+    -o-transform: skew(-14deg, 0deg);
+    transform: skew(-14deg, 0deg);
+}
+#battery_mask_gradient{
+	#background: linear-gradient(to right, crimson, dodgerblue);
+	background: linear-gradient(to right, #324a2a7d, #20bb009e);
+	border-radius: 4px;
+	display: inline-block;
+	#overflow: hidden;
+	width: 341px;
+	height: 96px;
+	position: absolute;
+	left: -18px;
+	-webkit-transform: skew(23deg, 0deg);
+        -ms-transform: skew(23deg, 0deg);
+         -o-transform: skew(23deg, 0deg);
+            transform: skew(23deg, 0deg);
+}
+#namecontainer{
+	text-align: center;
+}
+#chargetitle{
+	font-weight: bold;
+	font-size: 46pt;
+	margin: 30px 0px 0px 0px;
+}
+#chargingdata {
+	margin: 30px auto;
+	text-align: center;
+	font-weight: bold;
+	font-size: 30px;
+}
+#soe2 {
+	font-size: 46pt;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+}
+#range2{
+	font-size: 46pt;
+	font-weight: bold;
+	display:inline-block;
+}
+#power_remaining2{
+	font-size: 46pt;
+	font-weight: bold;
+	display:inline-block;
+}
+#soe2container{
+	width: 750px;
+	height: 70px;
+	margin: 0 auto;
+	text-align: center;
+	#border: 1px solid white;
+	#overflow:scroll;
+}
+.appends {
+	font-size:22pt;
+	color:#a9a9a9;
+	display:inline-block;
+	position:relative;
+	margin: 0;
+	padding: 0;
+}
+.mini_appends {
+	font-size:14pt;
+	color:#a9a9a9;
+	display:inline-block;
+	margin: 0;
+	padding: 0;
+}
+rect {
+    cursor: pointer;
+    #shape-rendering: crispEdges;
+	border-radius: 30px;
+    fill: url(#MyGradient);
+}
+#svg_bar {
+	width:298px;
+	height:96px;
+	-webkit-filter: opacity(.95);
+	filter: opacity(.95);
+	position: absolute;
+	top: 335px;
+	left: 350px;
 }
