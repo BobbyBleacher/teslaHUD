@@ -38,16 +38,16 @@
         if (hrs > 0){return hrs+'h '+min+ 'm remaining';}
         else {return min+ 'm remaining';}
     }
-    if (GET.vin == "56510") {
-        port = "4036";
+    if (GET.vin == "x") {
+        port = "x";
     }
     else {
-        port = "4035";
+        port = "x";
     }
     
     function getvitals(){
         var json_lv = $.ajax({
-            url: "http://longdog-canon.ddns.net:8088/longdog.ddns.net:" + port + "/get_data_values",
+            url: "http://YOURCORSANYWHERESEVER:" + port + "/get_data_values",
             async: false,
             dataType: 'json',
             timeout: 2000
@@ -55,7 +55,7 @@
         
         if (json_lv == null) {
             json_lv = $.ajax({
-            url: "http://longdog.ddns.net:8088/longdog.ddns.net:" + port + "/get_data_values",
+            url: "http://YOURCORSANYWHERESEVER:" + port + "/get_data_values",
             async: false,
             dataType: 'json',
         }).responseText
@@ -65,7 +65,7 @@
         //console.log(json_lv);
         json_lv = jQuery.parseJSON(json_lv);
         var json_raw = $.ajax({
-            url: "http://longdog-canon.ddns.net:8088/longdog.ddns.net:" + port + "/vitals?raw=true",
+            url: "http://YOURCORSANYWHERESEVER:" + port + "/vitals?raw=true",
             async: false,
             dataType: 'json',
             timeout: 2000
@@ -73,21 +73,21 @@
         
         if (json_raw == null) {
             json_raw = $.ajax({
-            url: "http://longdog.ddns.net:8088/longdog.ddns.net:" + port + "/vitals?raw=true",
+            url: "http://YOURCORSANYWHERESEVER:" + port + "/vitals?raw=true",
             async: false,
             dataType: 'json',
         }).responseJSON
         }
         
         var neurio_json = $.ajax({
-            url: "http://longdog-canon.ddns.net:8088/http://longdog-canon.ddns.net:7005/current-sample",
+            url: "http://YOURCORSANYWHERESEVER:7005/current-sample",
             async: false,
             dataType: "json",
         }).responseJSON
         
         if (neurio_json == null) {
             neurio_json = $.ajax({
-            url: "http://longdog.ddns.net:8088/http://longdog-canon.ddns.net:7005/current-sample",
+            url: "http://YOURCORSANYWHERESEVER:7005/current-sample",
             async: false,
             dataType: 'json',
         }).responseJSON
